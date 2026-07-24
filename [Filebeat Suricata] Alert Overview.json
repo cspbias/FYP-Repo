@@ -1,0 +1,834 @@
+{
+  "description": "Overview of the Suricata Alerts dashboard.",
+  "options": {
+    "auto_apply_filters": true,
+    "hide_panel_borders": false,
+    "hide_panel_titles": false,
+    "sync_colors": false,
+    "sync_cursor": true,
+    "sync_tooltips": false,
+    "use_margins": true
+  },
+  "tags": [],
+  "time_range": {
+    "from": "2026-07-05T06:00:00.000Z",
+    "to": "now"
+  },
+  "title": "[Filebeat Suricata] Alert Overview",
+  "filters": [],
+  "query": {
+    "expression": "",
+    "language": "kql"
+  },
+  "panels": [
+    {
+      "grid": {
+        "y": 7,
+        "x": 26,
+        "w": 22,
+        "h": 12
+      },
+      "config": {
+        "title": "Top Alert Signatures",
+        "description": "",
+        "type": "data_table",
+        "data_source": {
+          "type": "data_view_reference",
+          "ref_id": "filebeat-*"
+        },
+        "sampling": 1,
+        "ignore_global_filters": false,
+        "metrics": [
+          {
+            "operation": "count",
+            "empty_as_null": true,
+            "label": "Count",
+            "alignment": "left",
+            "width": 84.83333333333326
+          }
+        ],
+        "rows": [
+          {
+            "operation": "terms",
+            "fields": [
+              "rule.name"
+            ],
+            "label": "Alert Signature",
+            "limit": 15,
+            "rank_by": {
+              "type": "metric",
+              "metric_index": 0,
+              "direction": "desc"
+            },
+            "alignment": "left",
+            "width": 312.33333333333337
+          },
+          {
+            "operation": "terms",
+            "fields": [
+              "rule.category"
+            ],
+            "label": "Alert Category",
+            "limit": 5,
+            "rank_by": {
+              "type": "metric",
+              "metric_index": 0,
+              "direction": "desc"
+            },
+            "alignment": "left",
+            "width": 255.83333333333331
+          }
+        ],
+        "styling": {
+          "density": {
+            "mode": "expanded",
+            "height": {
+              "value": {
+                "type": "custom",
+                "lines": 1
+              },
+              "header": {
+                "type": "custom",
+                "max_lines": 3
+              }
+            }
+          },
+          "paging": 10,
+          "row_numbers": {
+            "visible": true
+          }
+        },
+        "filters": [
+          {
+            "disabled": false,
+            "data_view_id": "filebeat-*",
+            "type": "condition",
+            "condition": {
+              "field": "event.kind",
+              "operator": "is",
+              "value": "alert"
+            }
+          },
+          {
+            "disabled": false,
+            "data_view_id": "filebeat-*",
+            "type": "condition",
+            "condition": {
+              "field": "event.module",
+              "operator": "is",
+              "value": "suricata"
+            }
+          }
+        ]
+      },
+      "id": "2",
+      "type": "vis"
+    },
+    {
+      "grid": {
+        "y": 3,
+        "x": 0,
+        "w": 8,
+        "h": 8
+      },
+      "config": {
+        "hide_border": true,
+        "type": "pie",
+        "sampling": 1,
+        "ignore_global_filters": false,
+        "metrics": [
+          {
+            "operation": "count",
+            "empty_as_null": true
+          }
+        ],
+        "group_by": [
+          {
+            "operation": "histogram",
+            "include_empty_rows": true,
+            "granularity": "auto",
+            "field": "event.severity",
+            "color": {
+              "mode": "categorical",
+              "palette": "default",
+              "mapping": [
+                {
+                  "values": [
+                    1
+                  ],
+                  "color": {
+                    "type": "color_code",
+                    "value": "#ff0000"
+                  }
+                },
+                {
+                  "values": [
+                    2
+                  ],
+                  "color": {
+                    "type": "from_palette",
+                    "palette": "default",
+                    "index": 8
+                  }
+                },
+                {
+                  "values": [
+                    3
+                  ],
+                  "color": {
+                    "type": "from_palette",
+                    "palette": "default",
+                    "index": 9
+                  }
+                },
+                {
+                  "values": [
+                    4
+                  ],
+                  "color": {
+                    "type": "color_code",
+                    "value": "#041e52"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "data_source": {
+          "type": "data_view_reference",
+          "ref_id": "filebeat-*"
+        },
+        "legend": {
+          "visibility": "auto",
+          "nested": false
+        },
+        "styling": {
+          "labels": {
+            "visible": true,
+            "position": "outside"
+          },
+          "values": {
+            "visible": true,
+            "mode": "percentage"
+          }
+        }
+      },
+      "id": "48e4051e-5c06-459a-b252-6054614f2928",
+      "type": "vis"
+    },
+    {
+      "grid": {
+        "y": 3,
+        "x": 8,
+        "w": 8,
+        "h": 4
+      },
+      "config": {
+        "data_source": {
+          "type": "data_view_reference",
+          "ref_id": "filebeat-*"
+        },
+        "type": "metric",
+        "sampling": 1,
+        "ignore_global_filters": false,
+        "metrics": [
+          {
+            "type": "primary",
+            "operation": "formula",
+            "formula": "count()",
+            "label": "Total Alerts",
+            "filter": {
+              "expression": "event.module: \"suricata\" and event.kind: \"alert\"",
+              "language": "kql"
+            },
+            "color": {
+              "type": "static",
+              "color": "#000000"
+            }
+          }
+        ],
+        "styling": {
+          "primary": {
+            "position": "bottom",
+            "labels": {
+              "alignment": "left"
+            },
+            "value": {
+              "sizing": "auto",
+              "alignment": "right"
+            }
+          }
+        }
+      },
+      "id": "1d5d4702-e866-4219-b8a7-80963c8940d3",
+      "type": "vis"
+    },
+    {
+      "grid": {
+        "y": 3,
+        "x": 16,
+        "w": 8,
+        "h": 4
+      },
+      "config": {
+        "data_source": {
+          "type": "data_view_reference",
+          "ref_id": "filebeat-*"
+        },
+        "type": "metric",
+        "sampling": 1,
+        "ignore_global_filters": false,
+        "metrics": [
+          {
+            "type": "primary",
+            "operation": "formula",
+            "formula": "count(event.severity)",
+            "label": "Critical Alerts",
+            "filter": {
+              "expression": "event.severity: 1 ",
+              "language": "kql"
+            },
+            "color": {
+              "type": "dynamic",
+              "range": "absolute",
+              "steps": [
+                {
+                  "lt": 1,
+                  "color": "#24c292"
+                },
+                {
+                  "gte": 1,
+                  "color": "#f6726a"
+                }
+              ]
+            },
+            "apply_color_to": "background"
+          }
+        ],
+        "styling": {
+          "primary": {
+            "position": "bottom",
+            "labels": {
+              "alignment": "left"
+            },
+            "value": {
+              "sizing": "auto",
+              "alignment": "right"
+            }
+          }
+        },
+        "query": {
+          "expression": "event.severity: 1 ",
+          "language": "kql"
+        }
+      },
+      "id": "bf81aa4b-c30d-4316-9504-57263ca677d3",
+      "type": "vis"
+    },
+    {
+      "grid": {
+        "y": 3,
+        "x": 24,
+        "w": 8,
+        "h": 4
+      },
+      "config": {
+        "data_source": {
+          "type": "data_view_reference",
+          "ref_id": "filebeat-*"
+        },
+        "type": "metric",
+        "sampling": 1,
+        "ignore_global_filters": false,
+        "metrics": [
+          {
+            "type": "primary",
+            "operation": "formula",
+            "formula": "count(event.severity)",
+            "label": "High Alerts",
+            "filter": {
+              "expression": "event.severity: 2",
+              "language": "kql"
+            },
+            "color": {
+              "type": "dynamic",
+              "range": "absolute",
+              "steps": [
+                {
+                  "lt": 1,
+                  "color": "#24c292"
+                },
+                {
+                  "gte": 1,
+                  "lt": 10,
+                  "color": "#EAAE01"
+                },
+                {
+                  "gte": 10,
+                  "color": "#ff1515"
+                }
+              ]
+            },
+            "apply_color_to": "background"
+          }
+        ],
+        "styling": {
+          "primary": {
+            "position": "bottom",
+            "labels": {
+              "alignment": "left"
+            },
+            "value": {
+              "sizing": "auto",
+              "alignment": "right"
+            }
+          }
+        }
+      },
+      "id": "cb51850e-e47d-4182-8987-3f00f33049a2",
+      "type": "vis"
+    },
+    {
+      "grid": {
+        "y": 3,
+        "x": 32,
+        "w": 8,
+        "h": 4
+      },
+      "config": {
+        "data_source": {
+          "type": "data_view_reference",
+          "ref_id": "filebeat-*"
+        },
+        "type": "metric",
+        "sampling": 1,
+        "ignore_global_filters": false,
+        "metrics": [
+          {
+            "type": "primary",
+            "operation": "formula",
+            "formula": "count(event.severity, kql='event.severity: 3')",
+            "label": "Medium Alerts",
+            "color": {
+              "type": "dynamic",
+              "range": "absolute",
+              "steps": [
+                {
+                  "lt": 1,
+                  "color": "#24c292"
+                },
+                {
+                  "gte": 1,
+                  "color": "#FCD883"
+                }
+              ]
+            }
+          }
+        ],
+        "styling": {
+          "primary": {
+            "position": "bottom",
+            "labels": {
+              "alignment": "left"
+            },
+            "value": {
+              "sizing": "auto",
+              "alignment": "right"
+            }
+          }
+        }
+      },
+      "id": "78329429-2fc3-4a6e-9d33-b38068a13865",
+      "type": "vis"
+    },
+    {
+      "grid": {
+        "y": 3,
+        "x": 40,
+        "w": 8,
+        "h": 4
+      },
+      "config": {
+        "data_source": {
+          "type": "data_view_reference",
+          "ref_id": "filebeat-*"
+        },
+        "type": "metric",
+        "sampling": 1,
+        "ignore_global_filters": false,
+        "metrics": [
+          {
+            "type": "primary",
+            "operation": "formula",
+            "formula": "count(event.severity, kql='event.severity: 4')",
+            "label": "Low Alerts",
+            "color": {
+              "type": "static",
+              "color": "#000000"
+            }
+          }
+        ],
+        "styling": {
+          "primary": {
+            "position": "bottom",
+            "labels": {
+              "alignment": "left"
+            },
+            "value": {
+              "sizing": "auto",
+              "alignment": "right"
+            }
+          }
+        }
+      },
+      "id": "37351f59-7fff-47bf-bd5e-ac7940be142e",
+      "type": "vis"
+    },
+    {
+      "grid": {
+        "y": 7,
+        "x": 8,
+        "w": 18,
+        "h": 12
+      },
+      "config": {
+        "hide_border": true,
+        "type": "xy",
+        "layers": [
+          {
+            "type": "line",
+            "data_source": {
+              "type": "data_view_reference",
+              "ref_id": "filebeat-*"
+            },
+            "sampling": 1,
+            "ignore_global_filters": false,
+            "x": {
+              "operation": "date_histogram",
+              "field": "@timestamp",
+              "suggested_interval": "auto",
+              "use_original_time_range": false,
+              "include_empty_rows": true,
+              "drop_partial_intervals": false
+            },
+            "y": [
+              {
+                "operation": "formula",
+                "formula": "count()",
+                "label": "No. Of Alerts"
+              }
+            ],
+            "breakdown_by": {
+              "operation": "histogram",
+              "include_empty_rows": true,
+              "granularity": "auto",
+              "field": "event.severity",
+              "color": {
+                "mode": "categorical",
+                "palette": "elastic_brand_2023",
+                "mapping": [
+                  {
+                    "values": [
+                      4
+                    ],
+                    "color": {
+                      "type": "from_palette",
+                      "palette": "elastic_brand_2023",
+                      "index": 0
+                    }
+                  },
+                  {
+                    "values": [
+                      3
+                    ],
+                    "color": {
+                      "type": "from_palette",
+                      "palette": "elastic_brand_2023",
+                      "index": 2
+                    }
+                  },
+                  {
+                    "values": [
+                      2
+                    ],
+                    "color": {
+                      "type": "from_palette",
+                      "palette": "elastic_brand_2023",
+                      "index": 5
+                    }
+                  },
+                  {
+                    "values": [
+                      1
+                    ],
+                    "color": {
+                      "type": "color_code",
+                      "value": "#ff0000"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "axis": {
+          "x": {
+            "title": {
+              "visible": false
+            },
+            "ticks": {
+              "visible": true
+            },
+            "grid": {
+              "visible": true
+            },
+            "domain": {
+              "type": "fit",
+              "rounding": false
+            },
+            "labels": {
+              "orientation": "horizontal"
+            }
+          },
+          "y": {
+            "title": {
+              "visible": true
+            },
+            "scale": "linear",
+            "ticks": {
+              "visible": true
+            },
+            "grid": {
+              "visible": true
+            },
+            "domain": {
+              "type": "full",
+              "rounding": true
+            },
+            "labels": {
+              "orientation": "horizontal"
+            }
+          }
+        },
+        "styling": {
+          "overlays": {
+            "partial_buckets": {
+              "visible": false
+            },
+            "current_time_marker": {
+              "visible": false
+            }
+          },
+          "interpolation": "linear",
+          "points": {
+            "visibility": "auto"
+          }
+        },
+        "legend": {
+          "placement": "outside",
+          "position": "bottom",
+          "layout": {
+            "type": "list"
+          },
+          "visibility": "visible"
+        }
+      },
+      "id": "26ef3240-032f-4f33-8167-89a277258e74",
+      "type": "vis"
+    },
+    {
+      "grid": {
+        "y": 19,
+        "x": 0,
+        "w": 48,
+        "h": 9
+      },
+      "config": {
+        "title": "Alerts By Priority",
+        "hide_border": true,
+        "type": "data_table",
+        "data_source": {
+          "type": "data_view_reference",
+          "ref_id": "filebeat-*"
+        },
+        "sampling": 1,
+        "ignore_global_filters": false,
+        "metrics": [
+          {
+            "operation": "count",
+            "empty_as_null": true,
+            "label": "No. of Alerts"
+          }
+        ],
+        "rows": [
+          {
+            "operation": "histogram",
+            "include_empty_rows": true,
+            "granularity": "auto",
+            "field": "event.severity",
+            "label": "Priority",
+            "alignment": "center",
+            "width": 78
+          },
+          {
+            "operation": "terms",
+            "fields": [
+              "rule.name"
+            ],
+            "label": "Alert Signature",
+            "limit": 10,
+            "other_bucket": {
+              "include_documents_without_field": false
+            },
+            "rank_by": {
+              "type": "metric",
+              "metric_index": 0,
+              "direction": "desc"
+            },
+            "width": 517.5
+          },
+          {
+            "operation": "terms",
+            "fields": [
+              "source.ip"
+            ],
+            "label": "src.ip",
+            "limit": 10,
+            "other_bucket": {
+              "include_documents_without_field": false
+            },
+            "rank_by": {
+              "type": "metric",
+              "metric_index": 0,
+              "direction": "desc"
+            },
+            "width": 160
+          },
+          {
+            "operation": "terms",
+            "fields": [
+              "destination.ip"
+            ],
+            "label": "dst.ip",
+            "limit": 10,
+            "other_bucket": {
+              "include_documents_without_field": false
+            },
+            "rank_by": {
+              "type": "metric",
+              "metric_index": 0,
+              "direction": "desc"
+            },
+            "width": 144.5
+          },
+          {
+            "operation": "terms",
+            "fields": [
+              "destination.port"
+            ],
+            "label": "dst.port",
+            "limit": 9,
+            "other_bucket": {
+              "include_documents_without_field": false
+            },
+            "rank_by": {
+              "type": "metric",
+              "metric_index": 0,
+              "direction": "desc"
+            },
+            "width": 181.66666666666666
+          },
+          {
+            "operation": "terms",
+            "fields": [
+              "http.request.method"
+            ],
+            "label": "Method",
+            "limit": 10,
+            "other_bucket": {
+              "include_documents_without_field": false
+            },
+            "rank_by": {
+              "type": "metric",
+              "metric_index": 0,
+              "direction": "desc"
+            },
+            "width": 182
+          },
+          {
+            "operation": "terms",
+            "fields": [
+              "url.original"
+            ],
+            "label": "url.original",
+            "limit": 9,
+            "other_bucket": {
+              "include_documents_without_field": false
+            },
+            "rank_by": {
+              "type": "metric",
+              "metric_index": 0,
+              "direction": "desc"
+            }
+          }
+        ],
+        "styling": {
+          "row_numbers": {
+            "visible": true
+          }
+        }
+      },
+      "id": "34887b77-78ca-41ac-9c9c-ee07ffaabbef",
+      "type": "vis"
+    },
+    {
+      "grid": {
+        "y": 28,
+        "x": 0,
+        "w": 48,
+        "h": 17
+      },
+      "config": {
+        "title": "Discover Alerts ",
+        "description": "",
+        "ref_id": "1c2bcec0-86d1-11e8-b59d-21efb914e65c-ecs",
+        "selected_tab_id": "8e11d6da-24dc-485d-b90f-8c894ea87186",
+        "overrides": {
+          "sort": [
+            {
+              "name": "event.severity",
+              "direction": "asc"
+            }
+          ],
+          "column_settings": {
+            "@timestamp": {
+              "width": 158
+            },
+            "event.severity": {
+              "width": 121
+            },
+            "host.name": {
+              "width": 249
+            },
+            "source.port": {
+              "width": 208
+            },
+            "destination.ip": {
+              "width": 206
+            },
+            "rule.id": {
+              "width": 141
+            },
+            "source.ip": {
+              "width": 179
+            }
+          },
+          "density": "compact"
+        }
+      },
+      "id": "c0e80414-b9c9-4dc7-92dd-5723e5de8e24",
+      "type": "discover_session"
+    }
+  ],
+  "pinned_panels": []
+}
