@@ -1,0 +1,542 @@
+{
+  "description": "Overview of the Surcata events dashboard.",
+  "options": {
+    "auto_apply_filters": true,
+    "hide_panel_borders": false,
+    "hide_panel_titles": false,
+    "sync_colors": false,
+    "sync_cursor": true,
+    "sync_tooltips": false,
+    "use_margins": true
+  },
+  "tags": [],
+  "time_range": {
+    "from": "2026-07-05T06:00:00.000Z",
+    "to": "now"
+  },
+  "title": "[Filebeat Suricata] Events Overview",
+  "filters": [],
+  "query": {
+    "expression": "",
+    "language": "kql"
+  },
+  "panels": [
+    {
+      "grid": {
+        "y": 33,
+        "x": 0,
+        "w": 48,
+        "h": 19
+      },
+      "config": {
+        "description": "",
+        "ref_id": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
+        "selected_tab_id": "d0e21eb6-518e-4c10-b9f9-e17f8f32da99",
+        "overrides": {}
+      },
+      "id": "5",
+      "type": "discover_session"
+    },
+    {
+      "grid": {
+        "y": 7,
+        "x": 28,
+        "w": 10,
+        "h": 14
+      },
+      "config": {
+        "title": "Top Transport Protocols ",
+        "hide_border": true,
+        "description": "",
+        "type": "pie",
+        "sampling": 1,
+        "ignore_global_filters": false,
+        "metrics": [
+          {
+            "operation": "count",
+            "empty_as_null": true,
+            "label": "Count"
+          }
+        ],
+        "group_by": [
+          {
+            "operation": "terms",
+            "fields": [
+              "network.transport"
+            ],
+            "label": "network.transport: Descending",
+            "limit": 10,
+            "rank_by": {
+              "type": "metric",
+              "metric_index": 0,
+              "direction": "desc"
+            },
+            "color": {
+              "mode": "categorical",
+              "palette": "LEGACY_PALETTE_default",
+              "mapping": []
+            }
+          }
+        ],
+        "data_source": {
+          "type": "data_view_reference",
+          "ref_id": "filebeat-*"
+        },
+        "legend": {
+          "visibility": "visible",
+          "truncate_after_lines": 1,
+          "nested": false,
+          "size": "auto",
+          "position": "bottom"
+        },
+        "styling": {
+          "donut_hole": "s",
+          "labels": {
+            "visible": false
+          },
+          "values": {
+            "visible": true,
+            "mode": "percentage",
+            "percent_decimals": 2
+          }
+        },
+        "filters": [
+          {
+            "disabled": false,
+            "data_view_id": "filebeat-*",
+            "type": "condition",
+            "condition": {
+              "field": "event.kind",
+              "operator": "is",
+              "value": "event"
+            }
+          },
+          {
+            "disabled": false,
+            "data_view_id": "filebeat-*",
+            "type": "condition",
+            "condition": {
+              "field": "event.module",
+              "operator": "is",
+              "value": "suricata"
+            }
+          }
+        ]
+      },
+      "id": "8",
+      "type": "vis"
+    },
+    {
+      "grid": {
+        "y": 3,
+        "x": 0,
+        "w": 12,
+        "h": 4
+      },
+      "config": {
+        "hide_border": true,
+        "data_source": {
+          "type": "data_view_reference",
+          "ref_id": "filebeat-*"
+        },
+        "type": "metric",
+        "sampling": 1,
+        "ignore_global_filters": false,
+        "metrics": [
+          {
+            "type": "primary",
+            "operation": "count",
+            "empty_as_null": true,
+            "label": "Total Events",
+            "color": {
+              "type": "static",
+              "color": "#000000"
+            }
+          }
+        ],
+        "styling": {
+          "primary": {
+            "position": "bottom",
+            "labels": {
+              "alignment": "left"
+            },
+            "value": {
+              "sizing": "auto",
+              "alignment": "right"
+            }
+          }
+        },
+        "query": {
+          "expression": "event.module: \"suricata\"",
+          "language": "kql"
+        }
+      },
+      "id": "e61db922-b2d1-4dac-b2b0-aa76d5fb3c98",
+      "type": "vis"
+    },
+    {
+      "grid": {
+        "y": 3,
+        "x": 12,
+        "w": 12,
+        "h": 4
+      },
+      "config": {
+        "hide_border": true,
+        "data_source": {
+          "type": "data_view_reference",
+          "ref_id": "filebeat-*"
+        },
+        "type": "metric",
+        "sampling": 1,
+        "ignore_global_filters": false,
+        "metrics": [
+          {
+            "type": "primary",
+            "operation": "count",
+            "empty_as_null": true,
+            "label": "Total Non-Alert Events",
+            "color": {
+              "type": "static",
+              "color": "#0a5276"
+            }
+          }
+        ],
+        "styling": {
+          "primary": {
+            "position": "bottom",
+            "labels": {
+              "alignment": "left"
+            },
+            "value": {
+              "sizing": "auto",
+              "alignment": "right"
+            }
+          }
+        },
+        "query": {
+          "expression": "event.module: \"suricata\" and not event.kind: \"alert\"",
+          "language": "kql"
+        }
+      },
+      "id": "4f87372f-8b87-4108-9d4b-57013ca99e5d",
+      "type": "vis"
+    },
+    {
+      "grid": {
+        "y": 3,
+        "x": 24,
+        "w": 12,
+        "h": 4
+      },
+      "config": {
+        "hide_border": true,
+        "data_source": {
+          "type": "data_view_reference",
+          "ref_id": "filebeat-*"
+        },
+        "type": "metric",
+        "sampling": 1,
+        "ignore_global_filters": false,
+        "metrics": [
+          {
+            "type": "primary",
+            "operation": "count",
+            "empty_as_null": true,
+            "label": "Alert Events",
+            "color": {
+              "type": "dynamic",
+              "range": "absolute",
+              "steps": [
+                {
+                  "lt": 35,
+                  "color": "#24c292"
+                },
+                {
+                  "gte": 35,
+                  "lt": 70,
+                  "color": "#fcd883"
+                },
+                {
+                  "gte": 70,
+                  "color": "#f6726a"
+                }
+              ]
+            }
+          }
+        ],
+        "styling": {
+          "primary": {
+            "position": "bottom",
+            "labels": {
+              "alignment": "left"
+            },
+            "value": {
+              "sizing": "auto",
+              "alignment": "right"
+            }
+          }
+        },
+        "query": {
+          "expression": "event.module: \"suricata\" and event.kind: \"alert\"",
+          "language": "kql"
+        }
+      },
+      "id": "69c6d078-1602-41a7-ac39-7e1799fa1b92",
+      "type": "vis"
+    },
+    {
+      "grid": {
+        "y": 3,
+        "x": 36,
+        "w": 12,
+        "h": 4
+      },
+      "config": {
+        "hide_border": true,
+        "data_source": {
+          "type": "data_view_reference",
+          "ref_id": "filebeat-*"
+        },
+        "type": "metric",
+        "sampling": 1,
+        "ignore_global_filters": false,
+        "metrics": [
+          {
+            "type": "primary",
+            "operation": "count",
+            "empty_as_null": true,
+            "label": "High-Risk Alerts",
+            "color": {
+              "type": "dynamic",
+              "range": "absolute",
+              "steps": [
+                {
+                  "lt": 3.5,
+                  "color": "#24c292"
+                },
+                {
+                  "gte": 3.5,
+                  "lt": 7,
+                  "color": "#fcd883"
+                },
+                {
+                  "gte": 7,
+                  "color": "#f6726a"
+                }
+              ]
+            }
+          }
+        ],
+        "styling": {
+          "primary": {
+            "position": "bottom",
+            "labels": {
+              "alignment": "left"
+            },
+            "value": {
+              "sizing": "auto",
+              "alignment": "right"
+            }
+          }
+        },
+        "query": {
+          "expression": "event.module: \"suricata\" and event.kind: \"alert\" and event.severity <= 2",
+          "language": "kql"
+        }
+      },
+      "id": "e3d68b0a-23f5-456d-acdf-c2cf058e92d4",
+      "type": "vis"
+    },
+    {
+      "grid": {
+        "y": 7,
+        "x": 0,
+        "w": 18,
+        "h": 14
+      },
+      "config": {
+        "title": "Events By Category",
+        "hide_border": true,
+        "type": "treemap",
+        "sampling": 1,
+        "ignore_global_filters": false,
+        "metrics": [
+          {
+            "operation": "count",
+            "empty_as_null": true
+          }
+        ],
+        "group_by": [
+          {
+            "operation": "terms",
+            "fields": [
+              "event.category"
+            ],
+            "label": "Events by Category",
+            "limit": 9,
+            "other_bucket": {
+              "include_documents_without_field": false
+            },
+            "rank_by": {
+              "type": "metric",
+              "metric_index": 0,
+              "direction": "desc"
+            },
+            "color": {
+              "mode": "categorical",
+              "palette": "severity",
+              "mapping": []
+            }
+          }
+        ],
+        "data_source": {
+          "type": "data_view_reference",
+          "ref_id": "filebeat-*"
+        },
+        "legend": {
+          "visibility": "auto",
+          "nested": false
+        },
+        "styling": {
+          "values": {
+            "visible": true,
+            "mode": "percentage"
+          }
+        },
+        "query": {
+          "expression": "event.module: \"suricata\" and event.category: *",
+          "language": "kql"
+        }
+      },
+      "id": "406d3a8a-1d37-4f63-8bb6-a1a4acfd9c7b",
+      "type": "vis"
+    },
+    {
+      "grid": {
+        "y": 21,
+        "x": 0,
+        "w": 16,
+        "h": 12
+      },
+      "config": {
+        "title": "Events Over Time",
+        "hide_border": true,
+        "type": "xy",
+        "layers": [
+          {
+            "type": "bar_stacked",
+            "data_source": {
+              "type": "data_view_reference",
+              "ref_id": "filebeat-*"
+            },
+            "sampling": 1,
+            "ignore_global_filters": false,
+            "x": {
+              "operation": "date_histogram",
+              "field": "@timestamp",
+              "suggested_interval": "auto",
+              "use_original_time_range": false,
+              "include_empty_rows": true,
+              "drop_partial_intervals": false
+            },
+            "y": [
+              {
+                "operation": "count",
+                "empty_as_null": true,
+                "label": "Counts"
+              }
+            ],
+            "breakdown_by": {
+              "operation": "terms",
+              "fields": [
+                "event.category"
+              ],
+              "limit": 9,
+              "other_bucket": {
+                "include_documents_without_field": false
+              },
+              "rank_by": {
+                "type": "metric",
+                "metric_index": 0,
+                "direction": "desc"
+              },
+              "aggregate_first": true,
+              "color": {
+                "mode": "categorical",
+                "palette": "default",
+                "mapping": []
+              }
+            }
+          }
+        ],
+        "axis": {
+          "x": {
+            "title": {
+              "visible": false
+            },
+            "ticks": {
+              "visible": true
+            },
+            "grid": {
+              "visible": true
+            },
+            "domain": {
+              "type": "fit",
+              "rounding": false
+            },
+            "labels": {
+              "orientation": "horizontal"
+            }
+          },
+          "y": {
+            "title": {
+              "visible": true
+            },
+            "scale": "linear",
+            "ticks": {
+              "visible": true
+            },
+            "grid": {
+              "visible": true
+            },
+            "domain": {
+              "type": "full",
+              "rounding": true
+            },
+            "labels": {
+              "orientation": "horizontal"
+            }
+          }
+        },
+        "styling": {
+          "overlays": {
+            "partial_buckets": {
+              "visible": false
+            },
+            "current_time_marker": {
+              "visible": false
+            }
+          },
+          "bars": {
+            "minimum_height": 1,
+            "data_labels": {
+              "visible": false
+            }
+          }
+        },
+        "legend": {
+          "placement": "outside",
+          "position": "bottom",
+          "layout": {
+            "type": "list"
+          },
+          "visibility": "visible"
+        }
+      },
+      "id": "281090b5-7481-4194-815c-a0b86640e088",
+      "type": "vis"
+    }
+  ],
+  "pinned_panels": []
+}
