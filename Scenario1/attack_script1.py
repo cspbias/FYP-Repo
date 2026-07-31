@@ -14,7 +14,7 @@ import time
 import re
 
 
-BASE_URL        = "http://localhost"         
+BASE_URL        = "http://192.168.50.161"         
 LOGIN_URL       = f"{BASE_URL}/login.php"
 DASHBOARD_URL   = f"{BASE_URL}/dashboard.php"
 SEARCH_URL      = f"{BASE_URL}/supplier_search.php"
