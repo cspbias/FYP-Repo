@@ -1,0 +1,105 @@
+
+# Rule 1: Detect SQL injection using UPDATEXML error-based payload
+alert http any any -> any any (msg:"FYP HIGH: SQL Injection - UPDATEXML"; flow:to_server,established; http.request_body; content:"UPDATEXML"; nocase; content:"DATABASE"; nocase; distance:0; within:120; classtype:web-application-attack; priority:2; sid:5000001; rev:1; reference:url,attack.mitre.org/techniques/T1190/;)
+
+# Rule 2: Detect SQL injection role bypass attempt for staff
+alert http any any -> any any (msg:"FYP CRITICAL: SQL Injection - Staff Role Bypass"; flow:to_server,established; http.request_body; content:"OR+role%3D%27staff"; nocase; classtype:web-application-attack; priority:1; sid:5000002; rev:1; reference:url,attack.mitre.org/techniques/T1190/;)
+
+# Rule 3: Detect SQL injection role bypass attempt for admin
+alert http any any -> any any (msg:"FYP CRITICAL: SQL Injection - Admin Role Bypass"; flow:to_server,established; http.request_body; content:"OR+role%3D%27admin"; nocase; classtype:web-application-attack; priority:1; sid:5000003; rev:1; reference:url,attack.mitre.org/techniques/T1190/;)
+
+# Rule 4: Detect SQL error leakage in HTTP response
+alert http any any -> any any (msg:"FYP HIGH: SQL Injection - SQL Error Leak"; flow:to_client,established; http.response_body; content:"SQL Error"; nocase; content:"XPATH syntax error"; nocase; distance:0; within:150; classtype:web-application-attack; priority:2; sid:5000004; rev:1; reference:url,attack.mitre.org/techniques/T1190/;)
+
+# Rule 5: Detect backend SQL SELECT query exposed in response
+alert http any any -> any any (msg:"FYP HIGH: SQL Injection - Backend SELECT Query Exposed"; flow:to_client,established; http.response_body; content:"SELECT * FROM users"; nocase; classtype:web-application-attack; priority:2; sid:5000005; rev:1; reference:url,attack.mitre.org/techniques/T1190/;)
+
+# Rule 6: Detect TCP SYN scan traffic against uncommon ports
+alert tcp any any -> any ![22,53,80,123,443,5601,9200] (msg:"FYP MEDIUM: Reconnaissance - TCP SYN Scan"; flow:stateless; tcp.flags:S; detection_filter:track by_src, count 30, seconds 60; classtype:attempted-recon; priority:3; sid:5000006; rev:2; reference:url,attack.mitre.org/techniques/T1046/;)
+
+# Rule 7: Detect TCP XMAS scan traffic
+alert tcp any any -> any any (msg:"FYP MEDIUM: Reconnaissance - TCP XMAS Scan"; flow:stateless; tcp.flags:FPU; detection_filter:track by_src, count 8, seconds 60; classtype:attempted-recon; priority:3; sid:5000007; rev:2; reference:url,attack.mitre.org/techniques/T1046/;) 
+
+# Rule 8: Detect TCP NULL scan traffic
+alert tcp any any -> any any (msg:"FYP MEDIUM: Reconnaissance - TCP NULL Scan"; flow:stateless; tcp.flags:0; detection_filter:track by_src, count 8, seconds 60; classtype:attempted-recon; priority:3; sid:5000008; rev:2; reference:url,attack.mitre.org/techniques/T1046/;)
+
+# Rule 9: Detect TCP FIN sccan traffic
+alert tcp any any -> any any (msg:"FYP MEDIUM: Reconnaissance - TCP FIN Scan"; flow:stateless; tcp.flags:F; detection_filter:track by_src, count 8, seconds 60; classtype:attempted-recon; priority:3; sid:5000009; rev:2; reference:url,attack.mitre.org/techniques/T1046/;)
+
+# Rule 10: Detect UDP scan traffic against uncommon ports
+alert udp any any -> any ![53,67,68,123,137,138,161,1900,5353] (msg:"FYP LOW: Reconnaissance - UDP Scan"; detection_filter:track by_src, count 30, seconds 60; classtype:attempted-recon; priority:4; sid:5000010; rev:2; reference:url,attack.mitre.org/techniques/T1046/;)
+
+# Rule 11: Detect credential exfiltration to suspicious upload endpoint
+alert http any any -> any any (msg:"FYP CRITICAL: Data Exfiltration - Credentials Sent To Suspicious Upload Endpoint"; flow:to_server,established; http.method; content:"POST"; http.uri; pcre:"/(\/upload|\/collect|\/api\/upload|\/dump|\/backup)/i"; http.request_body; pcre:"/(password|passwd|api[_-]?key|secret|token|credential|card_number|db_password)=/i"; classtype:policy-violation; priority:1; sid:5000011; rev:1; reference:url,attack.mitre.org/techniques/T1567/;)
+
+# Rule 12: Detect large encoded data sent to suspicious endpoint
+alert http any any -> any any (msg:"FYP CRITICAL: Data Exfiltration - Large Encoded Data Upload"; flow:to_server,established; http.method; content:"POST"; http.uri; pcre:"/(\/upload|\/collect|\/api\/upload|\/dump|\/backup)/i"; http.request_body; pcre:"/(data|file|payload|blob|export)=([A-Za-z0-9+\/]{300,}={0,2})/i"; classtype:policy-violation; priority:1; sid:5000012; rev:1; reference:url,attack.mitre.org/techniques/T1567/;)
+
+# Rule 13: Detect credential theft via /steal endpoint
+alert http any any -> any any (msg:"FYP CRITICAL: Data Exfiltration - Credential Theft Via Steal Endpoint"; flow:to_server,established; http.method; content:"POST"; http.uri; content:"/steal"; nocase; http.request_body; content:"user="; nocase; content:"pass="; nocase; classtype:policy-violation; priority:1; sid:5000013; rev:1; reference:url,attack.mitre.org/techniques/T1056/;)
+
+# Rule 14: Detect data exfiltration via /exfil endpoint
+alert http any any -> any any (msg:"FYP CRITICAL: Data Exfiltration - Corporate Data Sent Via Exfil Endpoint"; flow:to_server,established; http.method; content:"POST"; http.uri; content:"/exfil"; nocase; http.request_body; content:"data="; nocase; content:"user="; nocase; classtype:policy-violation; priority:1; sid:5000014; rev:1; reference:url,attack.mitre.org/techniques/T1567/;)
+
+# Rule 15: Detect large data transfer through /exfil endpoint
+alert http any any -> any any (msg:"FYP CRITICAL: Data Exfiltration - Large HTTP POST Transfer"; flow:to_server,established; http.method; content:"POST"; http.uri; content:"/exfil"; nocase; http.request_body; content:"data="; nocase; isdataat:10000,relative; classtype:policy-violation; priority:1; sid:5000015; rev:1; reference:url,attack.mitre.org/techniques/T1567/;)
+
+# Rule 16: Detect multiple exfiltration attempts within a short period
+alert http any any -> any any (msg:"FYP CRITICAL: Data Exfiltration - Multiple Exfil Attempts"; flow:to_server,established; http.method; content:"POST"; http.uri; content:"/exfil"; nocase; detection_filter:track by_src, count 3, seconds 120; classtype:policy-violation; priority:1; sid:5000016; rev:1; reference:url,attack.mitre.org/techniques/T1567/;)
+
+# Rule 17: Detect admin login attempt as possible privilege escalation
+alert http any any -> any any (msg:"FYP HIGH: Privilege Escalation - Admin Login Attempt"; flow:to_server,established; http.method; content:"POST"; http.uri; content:"/index.php"; nocase; http.request_body; content:"username=admin"; nocase; classtype:attempted-admin; priority:2; sid:5000017; rev:1; reference:url,attack.mitre.org/techniques/T1078/;)
+
+# Rule 18: Detect brute force login failures
+alert http any any -> any any (msg:"FYP HIGH: Brute Force - Excessive Login Failures"; flow:to_client,established; http.response_body; content:"Invalid"; nocase; detection_filter:track by_dst, count 5, seconds 60; classtype:attempted-admin; priority:2; sid:5000018; rev:1; reference:url,attack.mitre.org/techniques/T1110/;)
+
+# Rule 19: Detect automated Python requests user-agent
+alert http any any -> any any (msg:"FYP MEDIUM: Suspicious Tool - Python Requests User Agent"; flow:to_server,established; http.user_agent; content:"python-requests"; nocase; classtype:attempted-recon; priority:3; sid:5000019; rev:1; reference:url,attack.mitre.org/techniques/T1190/;)
+
+# Rule 20: Detect outbound connection to suspicious attacker port 8080
+alert tcp any any -> any 8080 (msg:"FYP MEDIUM: Suspicious Connection - Outbound Connection To Port 8080"; flow:to_server; tcp.flags:S; classtype:attempted-recon; priority:3; sid:5000020; rev:1; reference:url,attack.mitre.org/techniques/T1105/;)
+
+# Rule 21: Detect login POST containing credentials
+alert http any any -> any any (msg:"FYP LOW: Web Activity - Login POST With Credentials"; flow:to_server,established; http.method; content:"POST"; http.uri; content:"/index.php"; nocase; http.request_body; content:"username="; nocase; content:"password="; nocase; classtype:attempted-admin; priority:4; sid:5000021; rev:1;)
+
+# Rule 22: Detect excessive database-related dashboard activity
+alert http any any -> any any (msg:"FYP HIGH: Data Exfiltration - Excessive Dashboard Query Activity"; flow:to_server,established; http.method; content:"POST"; http.uri; content:"/dashboard.php"; nocase; http.request_body; content:"exfil=1"; nocase; detection_filter:track by_src, count 3, seconds 60; classtype:policy-violation; priority:2; sid:5000022; rev:1; reference:url,attack.mitre.org/techniques/T1005/;)
+
+# Rule 23: Detect malicious payload download using /payload endpoint
+alert http any any -> any any (msg:"FYP HIGH: Malware Download - Payload Endpoint Access"; flow:to_server,established; http.uri; content:"/payload"; nocase; classtype:trojan-activity; priority:2; sid:5000023; rev:1; reference:url,attack.mitre.org/techniques/T1105/;)
+
+# Rule 24: Detect double-extension file download such as invoice.pdf.exe
+alert http any any -> any any (msg:"FYP HIGH: Malware Download - Double Extension File"; flow:to_client,established; http.response_header; pcre:"/filename[^\r\n]*\.(pdf|doc|docx|xls|xlsx|jpg|png)\.(exe|scr|bat|js|vbs|hta|ps1)/i"; classtype:trojan-activity; priority:2; sid:5000024; rev:2; reference:url,attack.mitre.org/techniques/T1204/;)
+
+# Rule 25: Detect executable file download using PE/MZ header
+alert http any any -> any any (msg:"FYP HIGH: Malware Download - Executable File MZ Header"; flow:to_client,established; file_data; content:"MZ"; startswith; classtype:trojan-activity; priority:2; sid:5000025; rev:1; reference:url,attack.mitre.org/techniques/T1105/;)
+
+# Rule 26: Detect C2 beacon check-in using /beacon endpoint
+alert http any any -> any any (msg:"FYP HIGH: Command and Control - Beacon Endpoint Check-In"; flow:to_server,established; http.uri; content:"/beacon"; nocase; classtype:command-and-control; priority:2; sid:5000026; rev:1; reference:url,attack.mitre.org/techniques/T1071/;)
+
+# Rule 27: Detect possible C2 beaconing through repeated HTTP GET requests
+alert http any any -> any any (msg:"FYP MEDIUM: Command and Control - Repeated HTTP GET Beaconing"; flow:to_server,established; http.method; content:"GET"; detection_filter:track by_src, count 5, seconds 120; classtype:command-and-control; priority:3; sid:5000027; rev:1; reference:url,attack.mitre.org/techniques/T1071/;)
+
+# Rule 28: Detect PowerShell user-agent making outbound web request
+alert http any any -> any any (msg:"FYP HIGH: Suspicious Tool - PowerShell User Agent"; flow:to_server,established; http.user_agent; content:"WindowsPowerShell"; nocase; classtype:trojan-activity; priority:2; sid:5000028; rev:1; reference:url,attack.mitre.org/techniques/T1059/001/;)
+
+# Rule 29: Detect large HTTP POST upload as possible data exfiltration
+alert http any any -> any any (msg:"FYP CRITICAL: Data Exfiltration - Large HTTP POST Upload"; flow:to_server,established; http.method; content:"POST"; http.request_body; isdataat:50000; classtype:trojan-activity; priority:1; sid:5000029; rev:1; reference:url,attack.mitre.org/techniques/T1567/;)
+
+# Rule 30: Detect ZIP archive uploaded outbound
+alert http any any -> any any (msg:"FYP CRITICAL: Data Exfiltration - ZIP Archive Upload"; flow:to_server,established; http.method; content:"POST"; http.request_header; content:"Content-Type"; nocase; content:"application/zip"; nocase; distance:0; within:100; classtype:trojan-activity; priority:1; sid:5000030; rev:1; reference:url,attack.mitre.org/techniques/T1567/;)
+
+# Rule 31: Detect DNS query for simulated malicious domain
+alert dns any any -> any 53 (msg:"FYP MEDIUM: DNS - Query For Simulated Malicious Domain"; dns.query; content:"free-invoice-tools.com"; nocase; classtype:trojan-activity; priority:3; sid:5000031; rev:1; reference:url,attack.mitre.org/techniques/T1071/004/;)
+
+# Rule 32: Detect repeated .encrypted file pattern in HTTP traffic
+alert http any any -> any any (msg:"FYP CRITICAL: Ransomware Activity - Encrypted File Pattern Observed"; flow:to_server,established; http.uri; content:".encrypted"; nocase; detection_filter:track by_src, count 5, seconds 5; classtype:trojan-activity; priority:1; sid:5000032; rev:1; reference:url,attack.mitre.org/techniques/T1486/;)
+
+# Rule 33: Detect ransom note content sent through HTTP
+alert http any any -> any any (msg:"FYP CRITICAL: Ransomware Activity - Ransom Note Detected"; flow:to_server,established; http.request_body; content:"!!!_READ_ME_RANSOM.txt"; nocase; content:"YOUR FILES HAVE BEEN ENCRYPTED"; nocase; distance:0; within:1000; classtype:trojan-activity; priority:1; sid:5000033; rev:1; reference:url,attack.mitre.org/techniques/T1486/;)
+
+# Rule 34: Detect DNS query linked to ransomware encryption process
+alert dns any any -> any any (msg:"FYP HIGH: Suspicious DNS - Ransomware Encryption Query"; flow:to_server; dns.query; content:"ransomware"; nocase; content:"encrypt"; nocase; classtype:bad-unknown; priority:2; sid:5000034; rev:1; reference:url,attack.mitre.org/techniques/T1486/;)
+
+
+
